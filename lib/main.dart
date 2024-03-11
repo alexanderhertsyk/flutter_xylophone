@@ -8,21 +8,15 @@ class XylophoneApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final notes = MusicNote.values.map((note) => NoteWidget(note)).toList();
+
     return MaterialApp(
       home: Scaffold(
         body: SafeArea(
-          child: Center(
-            child: Column(
-              children: [
-                MusicalNote('C', 1),
-                MusicalNote('D', 2),
-                MusicalNote('E', 3),
-                MusicalNote('F', 4),
-                MusicalNote('G', 5),
-                MusicalNote('A', 6),
-                MusicalNote('B', 7),
-              ],
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: notes,
           ),
         ),
       ),
@@ -30,20 +24,54 @@ class XylophoneApp extends StatelessWidget {
   }
 }
 
-class MusicalNote extends StatelessWidget {
-  MusicalNote(this.noteName, this.order, {super.key});
+class NoteWidget extends StatelessWidget {
+  NoteWidget(this.note, {super.key});
 
-  final String noteName;
-  final int order;
+  final MusicNote note;
   final player = AudioPlayer();
 
   @override
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: () async {
-        await player.play(AssetSource('note$order.wav'));
+        await player.play(AssetSource('note${note.number}.wav'));
       },
-      child: Text(noteName),
+      style: TextButton.styleFrom(
+        backgroundColor: note.color,
+        foregroundColor: Colors.white,
+      ),
+      child: Text(note.name),
     );
+  }
+}
+
+enum MusicNote {
+  c('C', 1),
+  d('D', 2),
+  e('E', 3),
+  f('F', 4),
+  g('G', 5),
+  a('A', 6),
+  b('B', 7);
+
+  const MusicNote(this.name, this.number);
+
+  final String name;
+  final int number;
+}
+
+extension MusicNoteColor on MusicNote {
+  MaterialColor get color {
+    final noteColors = <MaterialColor>[
+      Colors.red,
+      Colors.orange,
+      Colors.yellow,
+      Colors.green,
+      Colors.teal,
+      Colors.blue,
+      Colors.purple,
+    ];
+
+    return noteColors[number - 1];
   }
 }
